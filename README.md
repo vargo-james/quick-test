@@ -30,9 +30,9 @@ and love a "real test framework", then you don't need this one.
 
       e. all_my_tests->run_test(); all_my_tests->report(std::cout);
 
-    I usually forget what the last method calls are because I only write them
-    once per project. But then I just look in my last project (or in the 
-    test_suite class definition). You can just follow the examples here.
+      I usually forget what the last method calls are because I only write them
+      once per project. But then I just look in my last project (or in the 
+      test_suite class definition). You can just follow the examples here.
 
   2. HIERARCHICAL STRUCTURE: Tests are composed using the classic composite
     pattern. The actual class is `test_suite`. A test_suite object has the 
@@ -65,7 +65,7 @@ and love a "real test framework", then you don't need this one.
 ## Installation
 
   This is just one header file. If you want to test it, get the makefile
-  and the frameword_test.cpp file and put them in the directory  with ttest.h. 
+  and the framework_test.cpp file and put them in the directory  with ttest.h. 
   Then from that directory run
 
     $ make && make clean
@@ -86,12 +86,12 @@ using ttest::create_test;
 ```
 
   The extra t in the namespace stands for "tree". You will want to create
-  test_suite objects using the create_test function. This function is
-  overloaded to make simple test_suite objects containing just one test
-  function, and compound test_suite objects that contain many test functions.
+  `test_suite` objects using the `create_test` function. This function is
+  overloaded to make simple `test_suite` objects containing just one test
+  function, and compound `test_suite` objects that contain many test functions.
 
-  You will be working with test_suite::pointer objects. This is just a 
-  std::shared_ptr<test_suite>.
+  You will be working with `test_suite::pointer` objects. This is just a 
+  `std::shared_ptr<test_suite>`.
 
 #### Test Functions
 
@@ -107,15 +107,14 @@ using ttest::create_test;
     log.append()
 
   If you call append with no message, the error report will still identify
-  the exact test function which found the error.
-
-  Most of the time, it is convenient to report errors this way:
+  the exact test function which found the error.  Most of the time, it is 
+  convenient to report errors this way:
 
     log.append_if("error!", something_bad_happened);
     log.append_if(something_else_bad_happened);
 
   The non-string arguments are boolean values. An error is only registered
-  if its value is true.
+  if its value is `true`.
 
 #### Simple Tests
 
@@ -152,7 +151,7 @@ auto my_test = create_test("a big ol' test",
     {\* a list of test_suite::pointers*\});
 
 my_test->run_test();
-my_test->error_count();     // The number of log entries.
+my_test->error_count();     // Equals the number of log entries.
 my_test->report(std::cout);
 ```
 
@@ -177,17 +176,13 @@ using ttest::create_test;
 using ttest::test_suite;
 
 void myclass_testA(error_log& log) {
-
   bool first_test_failed = false;
   bool second_test_failed = true;
-
   // Test code here. Lets assume the booleans are unchanged.
-
   // Here is one way to register an error.
   if (first_test_failed) {          // It didn't fail.
     log.append("failure message");
   }
-
   // Here is another way. This test did fail, so this error gets registered.
   log.append_if("another failure message", second_test_failed);
 }
@@ -271,7 +266,6 @@ int main() {
   } else {
   std::cout << "No errors found\n";
   }
-
 }
 ```
 
