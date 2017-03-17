@@ -52,7 +52,7 @@ void hierarchy_test(error_log& log) {
   std::vector<std::string> messages;
   for (std::string line; std::getline(ss, line); messages.push_back(line)) {}
   std::sort(messages.begin(), messages.end(), 
-      [](const auto& l, const auto& r) {
+      [](const std::string& l, const std::string& r) {
         return l.back() < r.back();
       });
 
@@ -60,7 +60,7 @@ void hierarchy_test(error_log& log) {
     "compound::A", "compound::sub::B", "compound::sub::C"
   };
   log.append_if("mismatch", !std::equal(messages.begin(), messages.end(),
-        expected_messages.begin(), expected_messages.end()));
+        expected_messages.begin()));
 }
 
 int main() {

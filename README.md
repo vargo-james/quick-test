@@ -1,8 +1,8 @@
-# Quick Tests
+# Quick Test
 
 This is a simple, lightweight test framework for C++ programs. 
-It is called quick because you can start using it in about five minutes.  
-I made it for myself because I do not like writing tests and I do not like 
+It is called quick because you can start using it in about five minutes. I 
+made it for myself because I do not like writing tests and I do not like 
 reading documentation. So the use of any other test framework has two strikes 
 against it right away. I made this as easy as possible to use because I knew that
 if I ever forgot how to use it, then I would probably never use it again.
@@ -19,10 +19,15 @@ and love a "real test framework", then you don't need this one.
 ## Features
 
   1. SIMPLE INTERFACE: You need to know the following things:
+
     a. `#include "ttest.h"`. The extra t stands for "tree".
+
     b. Test functions have the signature `void(ttest::error_log&)`.
+
     c. `log.append("error message")` OR `log.append_if("msg", failure)`.
+
     d. The `create_test` function.
+
     e. all_my_tests->run_test(); all_my_tests->report(std::cout);
 
     I usually forget what the last method calls are because I only write them
@@ -56,6 +61,18 @@ and love a "real test framework", then you don't need this one.
   on my own machine (Debian 'jessie' with GCC 6.3). I plan to use the new
   overload of std::for_each at some point after C++17 comes out, so that 
   will certainly break on some old compilers.
+
+## Installation
+
+  This is just one header file. If you want to test it, get the makefile
+  and the frameword_test.cpp file and put them in the directory  with ttest.h. 
+  Then from that directory run
+
+    $ make && make clean
+
+  You should get a single message that says `Success`. If you don't then 
+  either your compiler does not support C++11, or I am stumped. 
+  You could post your error message to Issues.
 
 ## A Brief Explanation
 

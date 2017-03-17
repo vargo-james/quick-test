@@ -1,3 +1,5 @@
+CXXFLAGS = -std=c++11
+
 all : easy-test
 	@./easy-test
 

@@ -136,7 +136,7 @@ class test_suite {
 };
 
 inline void test_suite::collect_errors(const std::vector<pointer>& subtests) {
-  std::for_each(subtests.begin(), subtests.end(), [this](auto& test) {
+  std::for_each(subtests.begin(), subtests.end(), [this](pointer test) {
         test->run_test();
         this->errors_.incorporate(test->errors_);
       });
