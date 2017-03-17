@@ -20,15 +20,15 @@ and love a "real test framework", then you don't need this one.
 
   1. SIMPLE INTERFACE: You need to know the following things:
 
-    a. `#include "ttest.h"`. The extra t stands for "tree".
+      a. #include "ttest.h". The extra t stands for "tree".
 
-    b. Test functions have the signature `void(ttest::error_log&)`.
+      b. Test functions have the signature void(ttest::error_log&).
 
-    c. `log.append("error message")` OR `log.append_if("msg", failure)`.
+      c. log.append("error message") OR log.append_if("msg", failure).
 
-    d. The `create_test` function.
+      d. The create_test function.
 
-    e. all_my_tests->run_test(); all_my_tests->report(std::cout);
+      e. all_my_tests->run_test(); all_my_tests->report(std::cout);
 
     I usually forget what the last method calls are because I only write them
     once per project. But then I just look in my last project (or in the 
