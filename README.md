@@ -7,9 +7,10 @@ it right away. I made this as easy as possible to use because I knew that
 if I ever forgot how to use it, then I would probably never use it again.
 To that end, I made this is a header only library. There are no methods
 with more than a few lines of code, so I have simply inlined every one. 
-The interface has an easy learning curve. Of course that implies a certain lack
-of flexibility as well. But for my needs, and maybe yours, all that is 
-necessary is to run a series of test functions and then get a report listing
+I think the interface has an easy learning curve, and I sincerely hope that
+you agree because that was the whole point. Of course that implies a certain 
+lack of flexibility/functionality. But for my needs, and maybe yours, all that 
+is necessary is to run a series of test functions and then get a report listing
 any errors that were found.
 
 ## Features
@@ -19,16 +20,14 @@ any errors that were found.
     b. Test functions have the signature `void(ttest::error_log&)`.
     c. `log.append("error message")` OR `log.append_if("msg", failure)`.
     d. The `create_test` function.
-    e. all_my_tests->run_test();
-    f. all_my_tests->report(std::cout);
-    g. all_my_tests->error_count();
+    e. all_my_tests->run_test(); all_my_tests->report(std::cout);
 
-    I usually forget e, f, and g because I only write them once per project.
-    So I have to look in my last project to remember the names. You can follow
-    the examples here.
+    I usually forget what the last method calls are because I only write them
+    once per project. But then I just look in my last project (or in the 
+    test_suite class definition). You can just follow the examples here.
 
   2. HIERARCHICAL STRUCTURE: Tests are composed using the classic composite
-    pattern. The actual class name is test_suite. A test_suite object has the 
+    pattern. The actual class is `test_suite`. A test_suite object has the 
     structure of a tree. A leaf in this tree is a test_suite object that holds 
     a single test function. A proper node is a test_suite object that itself 
     holds a collection of test_suite objects. The benefit of this structure is 
@@ -43,14 +42,17 @@ any errors that were found.
     have concurrent threads writing to the log. Also, the code has been written
     in such as way as to enable the concurrent processing of test_functions
     once C++17 becomes the standard. I could have enabled that already of 
-    course, but I didn't think it would be worth the trouble. C++17 will make
-    it very easy because I will just have to add an execution policy to a
-    single call of std::for_each.
+    course, but for me, it wasn't worth the trouble. With C++17, I will simply
+    add an execution policy to a single call of std::for_each. WARNING: The
+    order in which tests are conducted is not specified. So your test functions
+    should be self contained. Thread safe is best.
 
 ## Requirements
 
   This should work if your compiler supports C++11. I have only tested it
-  on my own machine (Debian 'jessie' with GCC 6.3).
+  on my own machine (Debian 'jessie' with GCC 6.3). I plan to use the new
+  overload of std::for_each at some point after C++17 comes out, so that 
+  will certainly break on some old compilers.
 
 ## A Brief Explanation
 
@@ -250,7 +252,10 @@ int main() {
 
 Lets assume that the only errors were the ones indicatecd in the code examples 
 above.  Now if I didn't screw up my own example, the following output will be
-generated.
+generated. Please note that the order in which the messages are printed is
+not entirely well defined. The messages from one sub module will not
+be mixed with those from another sub module, but which sub module will be
+tested first is not known.
 
 ```
 my_program::mymodule::top level test::module failure
