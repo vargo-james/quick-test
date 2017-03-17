@@ -1,17 +1,20 @@
-# Easy Test
+# Quick Tests
 
-This is a simple, lightweight test framework for C++ programs. I made it for
-myself because I do not like writing tests and I do not like reading 
-documentation. So the use of any other test framework has two strikes against
-it right away. I made this as easy as possible to use because I knew that
+This is a simple, lightweight test framework for C++ programs. 
+It is called quick because you can start using it in about five minutes.  
+I made it for myself because I do not like writing tests and I do not like 
+reading documentation. So the use of any other test framework has two strikes 
+against it right away. I made this as easy as possible to use because I knew that
 if I ever forgot how to use it, then I would probably never use it again.
-To that end, I made this is a header only library. There are no methods
+To that end, I made this a header only library. There are no methods
 with more than a few lines of code, so I have simply inlined every one. 
+
 I think the interface has an easy learning curve, and I sincerely hope that
-you agree because that was the whole point. Of course that implies a certain 
+you agree. Of course that implies a certain 
 lack of flexibility/functionality. But for my needs, and maybe yours, all that 
 is necessary is to run a series of test functions and then get a report listing
-any errors that were found.
+any errors that were found. If you need more than that, or if you already know
+and love a "real test framework", then you don't need this one.
 
 ## Features
 
@@ -58,10 +61,12 @@ any errors that were found.
 
   Assume the following using declarations for all code below:
 
-    using namespace std;        // For the sake of brevity here.
-    using ttest::test_suite;
-    using ttest::error_log;
-    using ttest::create_test;
+```c++
+using namespace std;        // For the sake of brevity.
+using ttest::test_suite;
+using ttest::error_log;
+using ttest::create_test;
+```
 
   The extra t in the namespace stands for "tree". You will want to create
   test_suite objects using the create_test function. This function is
@@ -89,8 +94,8 @@ any errors that were found.
 
   Most of the time, it is convenient to report errors this way:
 
-    log.append_if("error!", this_is_bad);
-    log.append_if(this_is_also_bad);
+    log.append_if("error!", something_bad_happened);
+    log.append_if(something_else_bad_happened);
 
   The non-string arguments are boolean values. An error is only registered
   if its value is true.
@@ -100,9 +105,11 @@ any errors that were found.
   To make a simple test_suite object that contains just one test function
   you will need to use the `create_test` function with the following signature:
 
-    test_suite::pointer create_test(string name, function<void(error_log&)> test) 
+```c++
+test_suite::pointer create_test(string name, function<void(error_log&)> test);
 
-    auto my_simple_test = create_test("Foo",bar);
+auto my_simple_test = create_test("Foo",bar);
+```
 
 #### Compound Tests
 
@@ -116,7 +123,7 @@ test_suite::pointer create_test(string name,
 auto my_big_test = create_test("FooFoo", {
     create_test("Bar", testfun1),
     create_test("Baz", testfun2),
-    create_test("42")
+    create_test("42", testfun3)
   });
 ```
 
@@ -124,10 +131,11 @@ auto my_big_test = create_test("FooFoo", {
   Reports are sent to a std::ostream.
 
 ```c++
-auto my_test = create_test("big ol' test");
+auto my_test = create_test("a big ol' test", 
+    {\* a list of test_suite::pointers*\});
 
 my_test->run_test();
-my_test->error_count(); // The number of log entries.
+my_test->error_count();     // The number of log entries.
 my_test->report(std::cout);
 ```
 
