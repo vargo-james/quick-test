@@ -30,10 +30,9 @@ class error_log {
   void report(ostream& os) const;
 
   void append(const message_type& msg); 
-  void append_if(const message_type& msg, bool fail) {
-    if (fail) append(msg);
-  }
   void append() {append({});}
+  void append_if(const message_type& msg, bool fail) {if (fail) append(msg);}
+  void append_if(bool fail) {if (fail) append();}
 
   // This appends each message from the sublog into the log.
   void incorporate(const error_log& sublog);

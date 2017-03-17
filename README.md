@@ -18,7 +18,7 @@ any errors that were found.
     a. `#include "ttest.h"`. The extra t stands for "tree".
     b. Test functions have the signature `void(ttest::error_log&)`.
     c. `log.append("error message")` OR `log.append_if("msg", failure)`.
-    d. The `create_test` function for collecting test functions together.
+    d. The `create_test` function.
     e. all_my_tests->run_test();
     f. all_my_tests->report(std::cout);
     g. all_my_tests->error_count();
@@ -28,13 +28,12 @@ any errors that were found.
     the examples here.
 
   2. HIERARCHICAL STRUCTURE: Tests are composed using the classic composite
-    pattern. The actual class name is test_suite, but you won't need to 
-    remember that. A test_suite object has the structure of a tree.
-    A leaf in this tree is a test_suite object that holds a single test 
-    function. A proper node is a test_suite object that itself holds a 
-    collection of test_suite objects. The benefit of this structure is that
-    it is as easy to define the test object for your entire library/program
-    as it is for a single class method.
+    pattern. The actual class name is test_suite. A test_suite object has the 
+    structure of a tree. A leaf in this tree is a test_suite object that holds 
+    a single test function. A proper node is a test_suite object that itself 
+    holds a collection of test_suite objects. The benefit of this structure is 
+    that it is as easy to define the test object for your entire 
+    library/program as it is for a single class method.
 
   3. GOOD REPORTING: Error messages are "scoped" so that you can easily tell
     exactly which test function produced the message without having to somehow
@@ -50,42 +49,214 @@ any errors that were found.
 
 ## Requirements
 
-  1. Your compiler must support C++14.
+  This should work if your compiler supports C++11. I have only tested it
+  on my own machine (Debian 'jessie' with GCC 6.3).
+
+## A Brief Explanation
+
+  Assume the following using declarations for all code below:
+
+    using namespace std;        // For the sake of brevity here.
+    using ttest::test_suite;
+    using ttest::error_log;
+    using ttest::create_test;
+
+  The extra t in the namespace stands for "tree". You will want to create
+  test_suite objects using the create_test function. This function is
+  overloaded to make simple test_suite objects containing just one test
+  function, and compound test_suite objects that contain many test functions.
+
+  You will be working with test_suite::pointer objects. This is just a 
+  std::shared_ptr<test_suite>.
+
+#### Test Functions
+
+  To make tests you need to define test functions. A test function always has
+  the signature
+
+    void my_test_function(error_log& log);
+
+  Inside that test function, if your test uncovers an error, it should append
+  it to the log with an optional message.
+
+    log.append("error!")
+    log.append()
+
+  If you call append with no message, the error report will still identify
+  the exact test function which found the error.
+
+  Most of the time, it is convenient to report errors this way:
+
+    log.append_if("error!", this_is_bad);
+    log.append_if(this_is_also_bad);
+
+  The non-string arguments are boolean values. An error is only registered
+  if its value is true.
+
+#### Simple Tests
+
+  To make a simple test_suite object that contains just one test function
+  you will need to use the `create_test` function with the following signature:
+
+    test_suite::pointer create_test(string name, function<void(error_log&)> test) 
+
+    auto my_simple_test = create_test("Foo",bar);
+
+#### Compound Tests
+
+  To make a compound test_suite object you use the `create_test` function with
+  the following signature:
+
+```c++
+test_suite::pointer create_test(string name, 
+    initializer_list<test_suite::pointer> subtests);
+
+auto my_big_test = create_test("FooFoo", {
+    create_test("Bar", testfun1),
+    create_test("Baz", testfun2),
+    create_test("42")
+  });
+```
+
+#### Reporting
+  Reports are sent to a std::ostream.
+
+```c++
+auto my_test = create_test("big ol' test");
+
+my_test->run_test();
+my_test->error_count(); // The number of log entries.
+my_test->report(std::cout);
+```
+
+  In the report all messages are scoped using the names of the test_suite 
+  objects. So for each error listed in the report, it is very easy to identify
+  exactly which test function produced that error. See the detailed code
+  example to see what the output looks like.
+  
+
+## A Detailed Code Example
 
 The following code example should illustrate everything you need to know to 
 use this test framework.
 
-UNFINISHED EXAMPLE
-
-`example_tests.cpp`
+`myclass_tests.cpp`
 
 ```c++
 #include "ttest.h"
 
 using ttest::error_log;
 using ttest::create_test;
+using ttest::test_suite;
 
-void unit_testA(error_log& log) {
-  // Set things up.
+void myclass_testA(error_log& log) {
+
+  bool first_test_failed = false;
+  bool second_test_failed = true;
+
+  // Test code here. Lets assume the booleans are unchanged.
 
   // Here is one way to register an error.
-  if (first_test_failed) {
+  if (first_test_failed) {          // It didn't fail.
     log.append("failure message");
   }
 
-  // Here is another way.
+  // Here is another way. This test did fail, so this error gets registered.
   log.append_if("another failure message", second_test_failed);
 }
 
-void unit_testB(error_log& log) {
+void myclass_testB(error_log& log) {
   // Another test that registers errors with the log.
+  // Lets assume no errors are found in this test.
 }
 
-// Now I want to t
-void module_test_A(error_log&
+// Now we collect all the tests for myclass into a single test_suite.
+// It is convenient to make a function rather than a global object.
+test_suite::pointer create_myclass_test() {
+  return create_test("myclass", {
+    create_test("testA", myclass_testA),
+    create_test("testB", myclass_testB)
+  });
+}
+```
+
+So we might have a few other files with similar class tests in them. We can
+collect them together in the file `mymodule_tests.cpp`.
+
+```c++
+#include "ttest.h"
+
+using ttest::error_log;
+using ttest::create_test;
+using ttest::test_suite;
+
+// Declare the various unit tests.
+test_suite::pointer create_myclass_test();
+test_suite::pointer create_my_other_class_test();
+test_suite::pointer create_my_favorite_class_test();
+
+// Maybe we want a special test function that tests the whole module.
+void mymodule_test(error_log& log) {
+  bool an_error_occurred {false};
+  // Test code
+  // Lets assume it sets the boolean to true.
+  // This message does get appended.
+  append_if("module failure", an_error_occurred);
+}
+
+// Now we collect all our unit tests and our module test together.
+// Again, we define a function rather than a global object.
+test_suite::pointer create_mymodule_test() {
+  return create_test("mymodule", {
+    create_test("top level test", mymodule_test),
+    create_myclass_test(),
+    create_my_other_class_test(),
+    create_my_favorite_class_test(),
+  });
+}
+```
+
+Now we want to put all our module tests together in a file called 
+`all_tests.cpp`. This will put together all our tests, run them and give
+us a report.
+
+```
+#include "ttest.h"
+#include <iostream>
+
+using ttest::create_test;
+using ttest::test_suite;
+
+// Declare the module tests.
+test_suite::pointer create_mymodule_test();
+test_suite::pointer create_my_other_module_test();
+
+int main() {
+  auto big_test = create_test("my_program", {
+    create_mymodule_test(),
+    create_my_other_module_test(),
+  });
+
+  big_test->run_test();
+  
+  if (big_test->error_count() != 0) {
+    big_test->report(std::cout);
+  } else {
+  std::cout << "No errors found\n";
+  }
+
+}
+```
+
+Lets assume that the only errors were the ones indicatecd in the code examples 
+above.  Now if I didn't screw up my own example, the following output will be
+generated.
+
+```
+my_program::mymodule::top level test::module failure
+my_program::mymodule::myclass::testA::another failure message
 
 ```
 
-  
-  
-  
+In general, if you give reasonable names to your test_suite objects, it should 
+be clear exactly which test function produced each error.
