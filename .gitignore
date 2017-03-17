@@ -1,0 +1,7 @@
+build
+*.swp
+log
+easy-test
+.assert
+*.o
+altMakefile
