@@ -48,6 +48,9 @@ any errors that were found.
     it very easy because I will just have to add an execution policy to a
     single call of std::for_each.
 
+## Requirements
+
+  1. Your compiler must support C++14.
 
 The following code example should illustrate everything you need to know to 
 use this test framework.

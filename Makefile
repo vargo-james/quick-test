@@ -9,8 +9,8 @@ framework_test.o: framework_test.cpp ttest.h
 .PHONY : all clean
 
 clean :
-	@rm easy-test
-	@rm *.o
+	@-rm easy-test
+	@-rm *.o
 
 
 .SILENT:
